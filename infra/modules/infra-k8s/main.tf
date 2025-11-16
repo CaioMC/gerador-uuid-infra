@@ -3,6 +3,11 @@ data "aws_iam_user" "principal_user" {
   user_name = var.user_name
 }
 
+resource "aws_iam_user_policy_attachment" "iam_readonly" {
+  user       = data.aws_iam_user.principal_user.user_name
+  policy_arn = "arn:aws:iam::aws:policy/IAMReadOnlyAccess"
+}
+
 # Usando o módulo oficial da AWS para EKS
 module "eks" {
   source = "terraform-aws-modules/eks/aws"
@@ -25,7 +30,7 @@ module "eks" {
       desired_size = 1
 
       # Adicionar o tipo de AMI para evitar a consulta ao SSM
-      ami_type = "AL2023_x86_64_STANDARD"
+      # ami_type = "AL2023_x86_64_STANDARD"
 
       # Os Nodes também usam as Subnets Privadas
       subnet_ids = var.private_subnet_ids
