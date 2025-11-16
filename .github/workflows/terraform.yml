@@ -1,0 +1,56 @@
+name: Terraform Deploy Infra Gerador UUID (K8s + RDS Postgres) AWS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # permite rodar manualmente
+
+jobs:
+  terraform:
+    name: Terraform Apply (infra)
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+    defaults:
+      run:
+        working-directory: infra  # Atualizado para o diretório correto
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      # Clona o repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Instala o Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8  # Versão atualizada
+
+      # Configura credenciais da AWS
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Inicializa o Terraform (carrega backend remoto)
+      - name: Terraform Init
+        run: terraform init
+
+      # Valida sintaxe e dependências
+      - name: Terraform Validate
+        run: terraform validate
+
+      # Executa o plano
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve tfplan
