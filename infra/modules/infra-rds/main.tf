@@ -40,7 +40,7 @@ resource "aws_secretsmanager_secret_version" "secret_password_postgres" {
 }
 
 resource "aws_db_parameter_group" "db_parameter_group" {
-  name        = "db-rds-${var.rds_engine}-16"
+  name        = "db-rds-${var.aws_rds_engine}-16"
   family      = var.db_parameter_group_family
   description = "RDS cluster parameter group"
 }
