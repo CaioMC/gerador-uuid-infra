@@ -7,17 +7,24 @@ module "vpc" {
   azs                  = var.azs
 }
 
-# 2. Criação do Cluster EKS (infra-k8s)
+# 2. Criação do Usuário IAM e Políticas de Acesso
+module "iam-access" {
+  source = "./modules/iam-access"
+
+  user_name =  var.user_name
+}
+
+# 3. Criação do Cluster EKS (infra-k8s)
 module "infra-k8s" {
   source = "./modules/infra-k8s"
 
   cluster_name        = var.project_name
   vpc_id              = module.vpc.vpc_id
   private_subnet_ids  = module.vpc.private_subnet_ids # Passa os IDs das Subnets Privadas
-  user_name = var.user_name
+  principal_user_arn  = module.iam-access.user_arn
 }
 
-# 3. Criação do RDS (infra-rds)
+# 4. Criação do RDS (infra-rds)
 module "infra-rds" {
   source = "./modules/infra-rds"
 

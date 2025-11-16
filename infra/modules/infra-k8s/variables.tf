@@ -10,4 +10,4 @@ variable "instance_type" {
   description = "Tipo de instância EC2"
 }
 
-variable "user_name" {}
+variable "principal_user_arn" {}
