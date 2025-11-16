@@ -9,8 +9,8 @@ module "eks" {
   version = "21.8.0"
 
   # Argumentos de configuração do cluster no nível superior (Sintaxe Antiga/Alternativa)
-  cluster_name    = var.cluster_name
-  cluster_version = "1.33" # Versão EKS
+  name    = var.cluster_name
+  kubernetes_version = "1.33" # Versão EKS
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnet_ids # O Control Plane e os Nodes devem ser lançados nas Subnets Privadas
@@ -30,7 +30,7 @@ module "eks" {
   }
 
   # Instalação do Metrics Server como Addon (Nome de variável CORRETO)
-  cluster_addons = {
+  addons = {
     metrics-server = {
       resolve_conflicts = "OVERWRITE"
     }
