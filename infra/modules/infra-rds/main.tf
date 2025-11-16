@@ -1,7 +1,7 @@
 # 3.1. Security Group para o RDS
 resource "aws_security_group" "rds" {
 
-  name        = "sg-rds-${var.project_name}"
+  name        = "rds-${var.project_name}"
   description = "Permite acesso ao RDS apenas do EKS"
   vpc_id      = var.vpc_id
 
@@ -64,4 +64,7 @@ module "rds" {
   vpc_security_group_ids = [aws_security_group.rds.id]
   subnet_ids             = var.private_subnets_ids
   multi_az               = true
+
+  # Desativa a criação automática do grupo de parâmetros
+  create_db_parameter_group = false
 }

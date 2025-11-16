@@ -1,10 +1,10 @@
 # data IAM
-data "aws_iam_user" "principal_user" {
-  user_name = var.user_name
+resource "aws_iam_user" "principal_user" {
+  name = var.user_name
 }
 
 resource "aws_iam_user_policy_attachment" "iam_readonly" {
-  user       = data.aws_iam_user.principal_user.user_name
+  user       = aws_iam_user.principal_user.name
   policy_arn = "arn:aws:iam::aws:policy/IAMReadOnlyAccess"
 }
 
@@ -48,7 +48,7 @@ module "eks" {
   access_entries = {
     infra_user = {
 
-      principal_arn = data.aws_iam_user.principal_user.arn  # ARN do usuário IAM
+      principal_arn = aws_iam_user.principal_user.arn  # ARN do usuário IAM
       type = "STANDARD" # Tipo de acesso: STANDARD para usuários IAM
 
       access_policy_associations = {
