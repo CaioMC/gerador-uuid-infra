@@ -10,18 +10,14 @@ resource "aws_iam_policy" "ssm_access" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = [
-          "ssm:DescribeParameters"
+        Sid      = "Statement1"
+        Effect   = "Allow"
+        Action   = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath"
         ]
         Resource = "*"
-        Effect   = "Allow"
-      },
-      {
-        Action = [
-          "ssm:GetParameter"
-        ]
-        Resource = "arn:aws:ssm:*:*:parameter/aws/service/eks/optimized-ami/"
-        Effect   = "Allow"
       }
     ]
   })
