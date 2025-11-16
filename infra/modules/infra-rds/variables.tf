@@ -20,4 +20,6 @@ variable "rds_allocated_storage" {
   default     = 20
 }
 
+variable "db_parameter_group_family" { default = "postgres16" }
+
 variable "password" { default = "gerador123" }
