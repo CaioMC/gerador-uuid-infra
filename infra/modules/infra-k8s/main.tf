@@ -8,13 +8,16 @@ module "eks" {
   source = "terraform-aws-modules/eks/aws"
   version = "21.8.0"
 
-  cluster_name = var.cluster_name
-  cluster_version = "1.33" # Versão EKS
+  # Argumentos de configuração do cluster agora vão dentro do bloco 'cluster'
+  cluster = {
+    name    = var.cluster_name
+    version = "1.33" # Versão EKS
 
-  vpc_id = var.vpc_id
-  subnet_ids = var.private_subnet_ids # O Control Plane e os Nodes devem ser lançados nas Subnets Privadas
+    vpc_id     = var.vpc_id
+    subnet_ids = var.private_subnet_ids # O Control Plane e os Nodes devem ser lançados nas Subnets Privadas
+  }
 
-  # Configuração do Node Group
+  # Configuração do Node Group (continua no nível superior)
   eks_managed_node_groups = {
     default = {
       name = "node-group-eks"
@@ -28,13 +31,14 @@ module "eks" {
     }
   }
 
-  # Instalação do Metrics Server como Addon
+  # Instalação do Metrics Server como Addon (agora no nível superior, mas com o nome correto)
   cluster_addons = {
     metrics-server = {
       resolve_conflicts = "OVERWRITE"
     }
   }
 
+  # Configuração de Acesso (continua no nível superior)
   access_entries = {
     infra_user = {
 
