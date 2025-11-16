@@ -59,7 +59,7 @@ module "eks" {
       desired_size = 1
 
       # Adicionar o tipo de AMI para evitar a consulta ao SSM
-      # ami_type = "AL2023_x86_64_STANDARD"
+      ami_type = "AL2023_x86_64_STANDARD"
 
       # Os Nodes também usam as Subnets Privadas
       subnet_ids = var.private_subnet_ids
