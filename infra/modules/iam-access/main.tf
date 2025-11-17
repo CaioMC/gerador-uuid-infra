@@ -17,7 +17,10 @@ resource "aws_iam_policy" "ssm_access" {
           "ssm:GetParameters",
           "ssm:GetParametersByPath"
         ]
-        Resource = "*"
+        Resource = [
+          "arn:aws:ssm:us-east-1::parameter/aws/service/eks/optimized-ami/1.33/amazon-linux-2023/x86_64/standard/recommended/release_version",
+          "arn:aws:ssm:us-east-1:aws:parameter/aws/service/eks/optimized-ami/"
+        ]
       }
     ]
   })
