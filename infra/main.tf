@@ -33,6 +33,5 @@ module "infra-rds" {
   vpc_id                = module.vpc.vpc_id
   private_subnets_ids   = module.vpc.private_subnet_ids # Passa os IDs das Subnets Privadas
 
-  # Passa o ID do Security Group do EKS para a regra de Ingress do RDS
-  eks_security_group_id = module.infra-k8s.cluster_security_group_id
+  eks_security_group_id = module.infra-k8s.cluster_security_group_id # Passa o ID do Security Group do EKS para a regra de Ingress do RDS
 }
