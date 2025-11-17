@@ -1,17 +1,17 @@
-# 1. Criação da VPC e Subnets
+# 1. Criação do Usuário IAM e Políticas de Acesso
+module "iam-access" {
+  source = "./modules/iam-access"
+
+  user_name =  var.user_name
+}
+
+# 2. Criação da VPC e Subnets
 module "vpc" {
   source = "./modules/vpc"
 
   vpc_name             = var.project_name
   vpc_cidr             = var.vpc_cidr
   azs                  = var.azs
-}
-
-# 2. Criação do Usuário IAM e Políticas de Acesso
-module "iam-access" {
-  source = "./modules/iam-access"
-
-  user_name =  var.user_name
 }
 
 # 3. Criação do Cluster EKS (infra-k8s)
