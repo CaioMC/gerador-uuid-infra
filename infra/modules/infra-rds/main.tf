@@ -1,4 +1,3 @@
-# 3.1. Security Group para o RDS
 resource "aws_security_group" "rds" {
 
   name        = "rds-${var.project_name}"
@@ -26,7 +25,7 @@ resource "aws_security_group" "rds" {
 
 # Secrets Manager para armazenar as credenciais do PostgreSQL
 resource "aws_secretsmanager_secret" "secret_user_postgres" {
-  name                    = "rds-password-${var.project_name}"
+  name                    = "rds-pw-${var.project_name}"
   description             = "Credenciais do banco PostgreSQL RDS"
   recovery_window_in_days = 0
 }
@@ -45,26 +44,37 @@ resource "aws_db_parameter_group" "db_parameter_group" {
   description = "RDS cluster parameter group"
 }
 
-# 3.2. Instância RDS
-module "rds" {
+# Criação explícita do DB Subnet Group (Necessário para RDS em VPCs não-default)
+resource "aws_db_subnet_group" "rds_subnet_group" {
+  name       = "rds-subnet-group-${var.project_name}"
+  subnet_ids = var.private_subnets_ids
+  description = "DB Subnet Group for RDS instance"
+}
 
-  source                    = "terraform-aws-modules/rds/aws"
-  version                   = "~> 5.0"
-  identifier                = "db-${var.project_name}"
-  engine                    = var.aws_rds_engine
-  engine_version            = var.aws_rds_engine_version
-  instance_class            = var.aws_rds_instance_class
-  allocated_storage         = var.rds_allocated_storage
-  parameter_group_name      = aws_db_parameter_group.db_parameter_group.name
-  db_name                   = var.rds_db_name
-  username                  = jsondecode(aws_secretsmanager_secret_version.secret_password_postgres.secret_string)["username"]
-  password                  = jsondecode(aws_secretsmanager_secret_version.secret_password_postgres.secret_string)["password"]
+# 3.2. Instância RDS (Recurso nativo)
+resource "aws_db_instance" "rds_instance" {
+  identifier              = "db-${var.project_name}"
+  engine                  = var.aws_rds_engine
+  engine_version          = var.aws_rds_engine_version
+  instance_class          = var.aws_rds_instance_class
+  allocated_storage       = var.rds_allocated_storage
+  db_name                 = var.rds_db_name
+  username                = jsondecode(aws_secretsmanager_secret_version.secret_password_postgres.secret_string)["username"]
+  password                = jsondecode(aws_secretsmanager_secret_version.secret_password_postgres.secret_string)["password"]
 
-  # Subnet Group deve usar as Subnets Privadas
-  vpc_security_group_ids = [aws_security_group.rds.id]
-  subnet_ids             = var.private_subnets_ids
-  multi_az               = true
+  # Referências aos recursos criados
+  parameter_group_name    = aws_db_parameter_group.db_parameter_group.name
+  db_subnet_group_name    = aws_db_subnet_group.rds_subnet_group.name
+  vpc_security_group_ids  = [aws_security_group.rds.id]
 
-  # Desativa a criação automática do grupo de parâmetros
-  create_db_parameter_group = false
+  # Configurações de Alta Disponibilidade e Acesso
+  multi_az                = true
+  publicly_accessible     = false # Boa prática: RDS não deve ser público
+  skip_final_snapshot     = true  # Para ambientes de desenvolvimento/teste
+
+  # Tags
+  tags = {
+    Name        = "db-${var.project_name}"
+    Environment = "dev"
+  }
 }

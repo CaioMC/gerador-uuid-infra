@@ -32,6 +32,6 @@ variable "vpc_cidr" {
 
 variable "user_name" {
   type        = string
-  default     = "infra-user-project"
+  default     = "infra-user"
   description = "Nome do usuário"
 }

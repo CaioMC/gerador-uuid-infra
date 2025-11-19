@@ -1,19 +1,29 @@
-output "cluster_id" {
-  description = "ID do cluster EKS"
-  value       = module.eks.cluster_id
+output "cluster_name" {
+  description = "Nome do Cluster EKS"
+  value       = aws_eks_cluster.eks_cluster.name
 }
 
 output "cluster_endpoint" {
-  description = "Endpoint do cluster EKS"
-  value       = module.eks.cluster_endpoint
+  description = "Endpoint do Cluster EKS"
+  value       = aws_eks_cluster.eks_cluster.endpoint
 }
 
 output "cluster_security_group_id" {
-  description = "ID do Security Group do cluster EKS"
-  value       = module.eks.cluster_security_group_id
+  description = "ID do Security Group do Control Plane do Cluster EKS"
+  value       = aws_eks_cluster.eks_cluster.vpc_config[0].cluster_security_group_id
 }
 
-output "oidc_provider_arn" {
-  description = "ARN do provedor OIDC para IRSA"
-  value       = module.eks.oidc_provider_arn
+output "node_security_group_id" {
+  description = "ID do Security Group customizado dos nós EKS"
+  value       = aws_security_group.eks_node_custom_sg.id
+}
+
+output "eks_cluster_role_arn" {
+  description = "ARN da IAM Role do Cluster EKS"
+  value       = aws_iam_role.eks_cluster_role.arn
+}
+
+output "eks_node_role_arn" {
+  description = "ARN da IAM Role dos Nós EKS"
+  value       = aws_iam_role.eks_node_role.arn
 }

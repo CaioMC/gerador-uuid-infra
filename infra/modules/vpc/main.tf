@@ -17,7 +17,7 @@ locals {
 # Usando o módulo oficial da AWS para VPC
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "6.5.0"
+  version = "5.9.0"
 
   name = var.vpc_name
   cidr = var.vpc_cidr
@@ -26,6 +26,8 @@ module "vpc" {
   public_subnets  = local.public_subnets_cidr
   private_subnets = local.private_subnets_cidr
 
+  enable_dns_support   = true
+  enable_dns_hostnames = true
   enable_nat_gateway = true
   single_nat_gateway = true # Cria apenas 1 NAT Gateway para simplificar
 
