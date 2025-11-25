@@ -212,7 +212,17 @@ resource "aws_eks_addon" "vpc_cni" {
 }
 
 # -----------------------------------------------------------------------------------
-# 9. CONFIGURAÇÃO DE ACESSO (aws_auth ou access_entry)
+# 9. ADDON METRICS SERVER ADDON (para HPA e monitoramento)
+# -----------------------------------------------------------------------------------
+# Usando o novo recurso aws_eks_access_entry para o acesso do usuário principal
+# Enable Metrics Server Addon for EKS Cluster
+resource "aws_eks_addon" "metrics_server" {
+  cluster_name = aws_eks_cluster.eks_cluster.name
+  addon_name   = "metrics-server"
+}
+
+# -----------------------------------------------------------------------------------
+# 10. CONFIGURAÇÃO DE ACESSO (aws_auth ou access_entry)
 # -----------------------------------------------------------------------------------
 # Usando o novo recurso aws_eks_access_entry para o acesso do usuário principal
 resource "aws_eks_access_entry" "infra_user_access" {

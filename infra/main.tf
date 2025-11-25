@@ -16,9 +16,18 @@ module "iam-access" {
   depends_on = [module.vpc]
 }
 
-# 3. Criação do Cluster EKS (infra-k8s)
-module "infra-k8s" {
-  source = "./modules/infra-k8s"
+# 3. Criação do ECR
+module "ecr" {
+  source = "./modules/ecr"
+
+  ecr_repository_name = var.project_name
+
+  depends_on = [module.iam-access]
+}
+
+# 4. Criação do Cluster EKS
+module "k8s" {
+  source = "./modules/k8s"
 
   cluster_name        = var.project_name
   vpc_id              = module.vpc.vpc_id
@@ -26,15 +35,14 @@ module "infra-k8s" {
   principal_user_arn  = module.iam-access.user_arn
 }
 
-# 4. Criação do RDS (infra-rds)
-module "infra-rds" {
-  source = "./modules/infra-rds"
+# 5. Criação do RDS
+module "rds" {
+  source = "./modules/rds"
 
   project_name          = var.project_name
   vpc_id                = module.vpc.vpc_id
   private_subnets_ids   = module.vpc.private_subnet_ids # Passa os IDs das Subnets Privadas
+  eks_security_group_id = module.k8s.cluster_security_group_id # Passa o ID do Security Group do EKS para a regra de Ingress do RDS
 
-  eks_security_group_id = module.infra-k8s.cluster_security_group_id # Passa o ID do Security Group do EKS para a regra de Ingress do RDS
-
-  depends_on = [module.vpc, module.infra-k8s]
+  depends_on = [module.vpc, module.k8s]
 }
