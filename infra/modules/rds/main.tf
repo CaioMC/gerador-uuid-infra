@@ -25,7 +25,7 @@ resource "aws_security_group" "rds" {
 
 # Secrets Manager para armazenar as credenciais do PostgreSQL
 resource "aws_secretsmanager_secret" "secret_user_postgres" {
-  name                    = "rds-pw-${var.project_name}"
+  name                    = "rds-pw-${var.project_name}."
   description             = "Credenciais do banco PostgreSQL RDS"
   recovery_window_in_days = 0
 }
@@ -42,6 +42,13 @@ resource "aws_db_parameter_group" "db_parameter_group" {
   name        = "db-rds-${var.aws_rds_engine}-16"
   family      = var.db_parameter_group_family
   description = "RDS cluster parameter group"
+
+  # Parâmetro para desabilitar a exigência de SSL (resolvendo 'no encryption')
+  parameter {
+    name  = "rds.force_ssl"
+    value = "0"
+    apply_method = "immediate" # Aplica a mudança imediatamente
+  }
 }
 
 # Criação explícita do DB Subnet Group (Necessário para RDS em VPCs não-default)

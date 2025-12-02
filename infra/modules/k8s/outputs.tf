@@ -1,6 +1,16 @@
+output "cluster_id" {
+  description = "Nome do Cluster EKS"
+  value       = aws_eks_cluster.eks_cluster.id
+}
+
 output "cluster_name" {
   description = "Nome do Cluster EKS"
   value       = aws_eks_cluster.eks_cluster.name
+}
+
+output "cluster_ca_certificate" {
+  description = "Certificado CA do Cluster EKS"
+  value = aws_eks_cluster.eks_cluster.certificate_authority[0].data
 }
 
 output "cluster_endpoint" {

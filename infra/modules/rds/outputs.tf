@@ -18,6 +18,11 @@ output "rds_username" {
   value       = aws_db_instance.rds_instance.username
 }
 
+output "rds_password" {
+  description = "Senha do banco de dados"
+  value       = aws_db_instance.rds_instance.password
+}
+
 output "rds_security_group_id" {
   description = "ID do Security Group do RDS"
   value       = aws_security_group.rds.id
