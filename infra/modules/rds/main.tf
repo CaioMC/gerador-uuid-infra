@@ -25,7 +25,7 @@ resource "aws_security_group" "rds" {
 
 # Secrets Manager para armazenar as credenciais do PostgreSQL
 resource "aws_secretsmanager_secret" "secret_user_postgres" {
-  name                    = "rds-pw-${var.project_name}."
+  name                    = "rds-pw-${var.project_name}.."
   description             = "Credenciais do banco PostgreSQL RDS"
   recovery_window_in_days = 0
 }

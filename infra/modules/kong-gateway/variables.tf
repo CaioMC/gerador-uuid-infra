@@ -37,8 +37,3 @@ variable "rds_database" {
   description = "Nome do banco de dados do RDS"
   type        = string
 }
-
-variable "wait_for_stabilization" {
-  description = "ID do recurso time_sleep para forçar a espera"
-  type        = string
-}

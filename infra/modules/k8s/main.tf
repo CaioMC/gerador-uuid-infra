@@ -145,6 +145,19 @@ resource "aws_security_group_rule" "eks_node_custom_ingress_cluster" {
   description              = "Allow traffic from EKS Cluster SG (Kubelet 10250)"
 }
 
+# ADICIONAR REGRA DE ENTRADA (INBOUND) PARA O LOAD BALANCER (ELB)
+# Permite que o Load Balancer da AWS (que usa o NodePort) se conecte aos nós.
+resource "aws_security_group_rule" "eks_node_custom_ingress_elb" {
+  type              = "ingress"
+  from_port         = 30000 # Início do range de NodePort
+  to_port           = 32767 # Fim do range de NodePort
+  protocol          = "tcp"
+  # A fonte deve ser o CIDR da sua VPC para garantir que o ELB possa se conectar
+  cidr_blocks       = [var.vpc_cidr]
+  security_group_id = aws_security_group.eks_node_custom_sg.id
+  description       = "Allow ELB to connect to NodePorts (30000-32767)"
+}
+
 # -----------------------------------------------------------------------------------
 # 6. REGRA DE COMUNICAÇÃO NÓ -> CONTROL PLANE (PORTA 443)
 # -----------------------------------------------------------------------------------

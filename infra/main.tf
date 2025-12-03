@@ -33,6 +33,7 @@ module "k8s" {
   vpc_id              = module.vpc.vpc_id
   private_subnet_ids  = module.vpc.private_subnet_ids # Passa os IDs das Subnets Privadas
   principal_user_arn  = module.iam-access.user_arn
+  vpc_cidr            = var.vpc_cidr
 }
 
 # 5. Criação do RDS
@@ -47,31 +48,19 @@ module "rds" {
   depends_on = [module.vpc, module.k8s]
 }
 
-# 5.5. Força uma pausa para o Control Plane do EKS estabilizar
-resource "time_sleep" "wait_for_eks_stabilization" {
-  # Espera 120 segundos (2 minutos) após a criação do cluster EKS
-  depends_on = [module.k8s]
-
-  create_duration = "120s"
-}
-
 # 6. Instalação do Kong Gateway (NOVO BLOCO)
 module "kong-gateway" {
   source = "./modules/kong-gateway"
 
   # Credenciais EKS
-  cluster_id             = module.k8s.cluster_id
-  cluster_name           = module.k8s.cluster_name
-  cluster_endpoint       = module.k8s.cluster_endpoint
+  cluster_id       = module.k8s.cluster_id
+  cluster_name     = module.k8s.cluster_name
+  cluster_endpoint = module.k8s.cluster_endpoint
   cluster_ca_certificate = module.k8s.cluster_ca_certificate
 
   # Credenciais RDS
-  rds_endpoint           = module.rds.rds_endpoint # Assumindo que o RDS exporta o endpoint
-  rds_username           = module.rds.rds_username
-  rds_password           = module.rds.rds_password
-  rds_database           = module.rds.rds_db_name
-
-  wait_for_stabilization = time_sleep.wait_for_eks_stabilization.id
-
-  depends_on = [module.k8s, module.rds]
+  rds_endpoint = module.rds.rds_endpoint # Assumindo que o RDS exporta o endpoint
+  rds_username = module.rds.rds_username
+  rds_password = module.rds.rds_password
+  rds_database = module.rds.rds_db_name
 }

@@ -1,4 +1,31 @@
-# 1. Instalação do Kong Gateway via Helm Chart
+# Data Source para obter o Token de Autenticação do EKS
+data "aws_eks_cluster_auth" "cluster_au" {
+  name = var.cluster_name
+}
+
+# 5.5. Força uma pausa para o Control Plane do EKS estabilizar
+resource "time_sleep" "wait_eks_for_stabilization" {
+  # Espera 120 segundos (2 minutos) após a criação do cluster EKS
+  create_duration = "120s"
+}
+
+# 1. Configuração do Provider Kubernetes
+provider "kubernetes" {
+  host                   = var.cluster_endpoint
+  cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
+  token                  = data.aws_eks_cluster_auth.cluster_au.token
+}
+
+# 2. Configuração do Provider Helm
+provider "helm" {
+  kubernetes = {
+    host                   = var.cluster_endpoint
+    cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
+    token                  = data.aws_eks_cluster_auth.cluster_au.token
+  }
+}
+
+# 3. Instalação do Kong Gateway via Helm Chart
 resource "helm_release" "kong" {
   name       = "kong"
   repository = "https://charts.konghq.com"
@@ -49,7 +76,5 @@ resource "helm_release" "kong" {
     }
   ]
 
-  depends_on = [
-    var.wait_for_stabilization # FORÇA A ESPERA DE 120 SEGUNDOS
-  ]
+  depends_on = [time_sleep.wait_eks_for_stabilization]
 }
