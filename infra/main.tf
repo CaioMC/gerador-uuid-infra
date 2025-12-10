@@ -48,7 +48,7 @@ module "rds" {
   depends_on = [module.vpc, module.k8s]
 }
 
-# 6. Instalação do Kong Gateway (NOVO BLOCO)
+# 6. Instalação do Kong Gateway(NOVO BLOCO)
 module "kong-gateway" {
   source = "./modules/kong-gateway"
 
